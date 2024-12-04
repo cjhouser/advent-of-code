@@ -74,13 +74,38 @@ func main() {
 		heap.Push(ys, y)
 	}
 
+	// n => [A.count(n), B.count(n)]
+	counts := map[int][]int{}
+
 	// Process the data
-	total := 0
+	total_distance := 0
 	for xs.Len() > 0 && ys.Len() > 0 {
 		x := heap.Pop(xs).(int)
 		y := heap.Pop(ys).(int)
-		total = total + distance(x, y)
+
+		_, ok := counts[x]
+		if !ok {
+			counts[x] = []int{0, 0}
+		}
+
+		_, ok = counts[y]
+		if !ok {
+			counts[y] = []int{0, 0}
+		}
+
+		counts[x][0]++
+		counts[y][1]++
+
+		total_distance = total_distance + distance(x, y)
 	}
 
-	fmt.Println(total)
+	total_similarity_score := 0
+	for n, n_counts := range counts {
+		total_similarity_score += n * n_counts[0] * n_counts[1]
+	}
+
+	fmt.Printf("total distance: %d\ntotal similarity score: %d\n",
+		total_distance,
+		total_similarity_score,
+	)
 }
