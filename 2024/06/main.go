@@ -131,12 +131,15 @@ func main() {
 		panic(err)
 	}
 
-	visited, _ := simulateRoute(deepCopyMatrix(matrix), guardRow, guardCol, guardFacing)
+	// Save the unmodified path of the guard to optimize loop search
+	// an obstacle can only be placed in the unmodified path to create a loop
+	initialTraversal := deepCopyMatrix(matrix)
+	visited, _ := simulateRoute(initialTraversal, guardRow, guardCol, guardFacing)
 
 	loops := 0
 	for row := 0; row < len(matrix); row++ {
 		for col := 0; col < len(matrix[0]); col++ {
-			if !(row == guardRow && col == guardCol) && !matrix[row][col].Blocked {
+			if !(row == guardRow && col == guardCol) && !matrix[row][col].Blocked && (initialTraversal[row][col].Up || initialTraversal[row][col].Right || initialTraversal[row][col].Down || initialTraversal[row][col].Left) {
 				matrix[row][col].Blocked = true
 				if _, loop := simulateRoute(deepCopyMatrix(matrix), guardRow, guardCol, guardFacing); loop {
 					loops++
@@ -146,6 +149,5 @@ func main() {
 		}
 	}
 
-	fmt.Println(visited)
-	fmt.Println(loops)
+	fmt.Printf("part1: %d\npart2: %d\n", visited, loops)
 }
